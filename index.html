@@ -408,7 +408,7 @@ const generations = [
       "Doja Cat: Say So"
     ],
     instruments: "Laptop, FL Studio, beat machines, samples, 808s, global rhythms",
-    about: "Anything goes: TikTok sounds, streaming, hyperpop, afrobeats, drill, K-pop, and even lo-fi for studying. Music's changing faster than ever before.",
+    about: "Anything goes: TikTok sounds, streaming, hyperpop, afrobeats, drill, K-pop, and even lo-fi for studying and relaxation.",
     funFacts: [
       "Olivia Rodrigo's 'drivers license' broke Spotify's record for most streams in a single day for a non-holiday song.",
       "Bad Bunny became the most-streamed artist on Spotify in 2022, marking the rise of Spanish-language music globally.",
@@ -476,7 +476,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let demoList = '';
     gen.songDemos.forEach((demo, i) => {
       const embedUrl = buildYouTubeEmbed(demo.url);
-      // Use audio tag, preload demo
       demoList += `
         <div class="music-player">
           <strong>🎶 ${demo.title}</strong><br>
@@ -488,18 +487,14 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
     });
-    // Top songs
     let topSongsHtml = "<ul>";
     gen.topSongs.forEach(song => { topSongsHtml += "<li>"+song+"</li>";});
     topSongsHtml += "</ul>";
 
-    // Navigation
     let navButtons = '';
-    // Like/Dislike only if not at edge
     let noPast = (genIdx === 0);
     let noFuture = (genIdx === generations.length-1);
 
-    // Main "Do you like this?" question
     navButtons += `
       <div class="likes-buttons">
         <button id="like-yes">👍 I like it!</button>
@@ -548,30 +543,27 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     `;
 
-    // After render attaches
     document.getElementById("like-yes").onclick = () => {
       renderDetailedView(genIdx);
       stepGeneration.style.display = 'none';
       stepDetailed.style.display = '';
     };
     document.getElementById("like-no").onclick = () => {
-      // Show two pathway buttons
       document.getElementById("choose-paths").style.display = "";
     };
 
     const btnPast = document.getElementById("to-past");
     const btnFuture = document.getElementById("to-future");
-    if(btnPast) {
+    if (btnPast) {
       btnPast.onclick = function() {
         if (genIdx === 0) {
-          // This should not happen
           alert("No more past generations to explore.");
         } else {
           renderGenerationScreen(genIdx - 1);
         }
       };
     }
-    if(btnFuture) {
+    if (btnFuture) {
       btnFuture.onclick = function() {
         if (genIdx === generations.length-1) {
           alert("No more future generations to explore.");
@@ -585,17 +577,15 @@ document.addEventListener('DOMContentLoaded', function() {
       stepGeneration.style.display = 'none';
       stepDetailed.style.display = 'none';
       stepDob.style.display = '';
-      // Reset any state
       document.getElementById('dob').value = '';
     };
   }
 
   function renderDetailedView(genIdx) {
     const gen = generations[genIdx];
-    
-    // Build demo tracks
+
     let demoList = '';
-    gen.songDemos.forEach((demo, i) => {
+    gen.songDemos.forEach((demo) => {
       const embedUrl = buildYouTubeEmbed(demo.url);
       demoList += `
         <div class="music-player">
@@ -608,13 +598,11 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       `;
     });
-    
-    // Top songs
+
     let topSongsHtml = "<ul>";
     gen.topSongs.forEach(song => { topSongsHtml += "<li>"+song+"</li>";});
     topSongsHtml += "</ul>";
 
-    // Fun facts
     let funFactsHtml = "<ul style='list-style-type: none; padding-left: 0;'>";
     gen.funFacts.forEach(fact => {
       funFactsHtml += `<li style='margin: 10px 0; padding-left: 20px; position: relative;'><span style='position: absolute; left: 0;'>✨</span>${fact}</li>`;
@@ -625,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="generation-section">
         <div class="meta"><span class="emoji">${gen.emoji}</span> <span style="font-size:1.12em;font-weight:bolder">${gen.name}</span></div>
         <div style="font-style:italic;color:#b4bfec; margin-bottom: 20px;">${gen.genres} · ${gen.mood}</div>
-        
+
         <div style="background: #1a1f34; border-radius: 8px; padding: 20px; margin: 20px 0;">
           <h2 style="color: #ffd369; margin-top: 0;">📚 All About This Generation</h2>
           <div class="artists"><b>Key Artists:</b> ${gen.artists}</div>
@@ -635,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <div class="song-list" style="margin: 20px 0;"><b>Demo Instrumental Tracks:</b>${demoList}</div>
-        
+
         <div class="top-songs" style="margin: 20px 0;"><b>Top Songs from this Era:</b> ${topSongsHtml}</div>
 
         <div style="background: #1a1f34; border-radius: 8px; padding: 20px; margin: 20px 0;">
@@ -648,7 +636,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     `;
-    
+
     stepDetailed.innerHTML = `
       <h1>Your Musical Generation - Deep Dive</h1>
       ${detailedSection}
@@ -658,537 +646,6 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     `;
 
-    // Attach event handlers
-    document.getElementById("back-to-generation").onclick = function() {
-      stepDetailed.style.display = 'none';
-      stepGeneration.style.display = '';
-    };
-
-    document.getElementById("restart-detailed").onclick = function() {
-      stepDetailed.style.display = 'none';
-      stepGeneration.style.display = 'none';
-      stepDob.style.display = '';
-      document.getElementById('dob').value = '';
-    };
-  }
-
-  function ordinalSuffix(num) {
-    if (num % 10 == 1 && num % 100 != 11) return num + "st";
-    if (num % 10 == 2 && num % 100 != 12) return num + "nd";
-    if (num % 10 == 3 && num % 100 != 13) return num + "rd";
-    return num + "th";
-  }
-});
-</script>
-</body>
-</html>
-];
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Set max date for DOB input to today
-  document.getElementById('dob').max = new Date().toISOString().split('T')[0];
-
-  const stepDob = document.getElementById("step-dob");
-  const stepGeneration = document.getElementById("step-generation");
-  const stepDetailed = document.getElementById("step-detailed");
-
-  let userGenerationIndex = null;
-
-  document.getElementById("submit-dob").onclick = function() {
-    const dobValue = document.getElementById("dob").value;
-    if (!dobValue) {
-      alert("Please enter your date of birth!");
-      return;
-    }
-    const year = (new Date(dobValue)).getFullYear();
-    userGenerationIndex = getGenerationIndexByYear(year);
-
-    if (userGenerationIndex === -1) {
-      alert("Couldn't determine your generation from the date. Please try again.");
-      return;
-    }
-    // Go to generation info page
-    renderGenerationScreen(userGenerationIndex);
-    stepDob.style.display = 'none';
-    stepGeneration.style.display = '';
-  };
-
-  function getGenerationIndexByYear(year) {
-    for (let i=0; i<generations.length; ++i) {
-      let [start, end] = generations[i].years;
-      if (year >= start && year <= end)
-        return i;
-    }
-    return -1;
-  }
-
-  function getYouTubeId(url) {
-    if (!url) return null;
-    const match = url.match(
-      /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/
-    );
-    return match ? match[1] : null;
-  }
-
-  function buildYouTubeEmbed(url) {
-    const id = getYouTubeId(url);
-    if (!id) return null;
-    return `https://www.youtube.com/embed/${id}`;
-  }
-
-  function renderGenerationScreen(genIdx) {
-    const gen = generations[genIdx];
-    let demoList = '';
-    gen.songDemos.forEach((demo, i) => {
-      const embedUrl = buildYouTubeEmbed(demo.url);
-      // Use audio tag, preload demo
-      demoList += `
-        <div class="music-player">
-          <strong>🎶 ${demo.title}</strong><br>
-          ${
-            embedUrl
-              ? `<iframe style="width:100%;aspect-ratio:16/9;margin-top:8px;border:0;" src="${embedUrl}" title="${demo.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
-              : `<div class="meta" style="margin-top:8px;">Add YouTube URL for this track.</div>`
-          }
-        </div>
-      `;
-    });
-    // Top songs
-    let topSongsHtml = "<ul>";
-    gen.topSongs.forEach(song => { topSongsHtml += "<li>"+song+"</li>";});
-    topSongsHtml += "</ul>";
-
-    // Navigation
-    let navButtons = '';
-    // Like/Dislike only if not at edge
-    let noPast = (genIdx === 0);
-    let noFuture = (genIdx === generations.length-1);
-
-    // Main "Do you like this?" question
-    navButtons += `
-      <div class="likes-buttons">
-        <button id="like-yes">👍 I like it!</button>
-        <button id="like-no">👎 Not my vibe</button>
-      </div>
-    `;
-
-    let pathButtons = "";
-    if (!noPast) {
-      pathButtons += `<button id="to-past" style="margin-top:6px;">⬅ Explore Past Generation</button>`;
-    } else {
-      pathButtons += `<button disabled>No more past generations</button>`;
-    }
-
-    if (!noFuture) {
-      pathButtons += `<button id="to-future" style="margin-top:6px;">Explore Future Generation ➡</button>`;
-    } else {
-      pathButtons += `<button disabled>No more future generations</button>`;
-    }
-
-    let genSection = `
-      <div class="generation-section" >
-        <div class="meta"><span class="emoji">${gen.emoji}</span> <span style="font-size:1.12em;font-weight:bolder">${gen.name}</span></div>
-        <div style="font-style:italic;color:#b4bfec">${gen.genres} · ${gen.mood}</div>
-        <div class="artists"><b>Key Artists:</b> ${gen.artists}</div>
-        <div><b>Motto/Quote:</b> <span style="color:#ffd369">${gen.phrase}</span></div>
-        <div class="song-list"><b>Demo Instrumental Tracks:</b>${demoList}</div>
-        <div class="top-songs"><b>Top Songs from this Era:</b> ${topSongsHtml}</div>
-        <div><b>Common Instruments:</b> ${gen.instruments}</div>
-        <div style="margin:7px 0 15px 0;"><b>About this generation:</b><br> ${gen.about}</div>
-        <div class="meta" style="margin-bottom:10px;">
-           You are in the <b>${ordinalSuffix(genIdx+1)} out of ${generations.length} musical generations</b>.
-        </div>
-        ${navButtons}
-        <div id="choose-paths" style="display:none;margin-top:12px;">
-          <div style="font-size:1em;font-weight:bold;margin-bottom:8px;">Where would you like to go?</div>
-          ${pathButtons}
-        </div>
-      </div>
-    `;
-    stepGeneration.innerHTML = `
-      <h1>Your Musical Generation</h1>
-      ${genSection}
-      <div style="margin:18px 0 0 0; text-align:center;">
-        <button id="restart">🔄 Start Over</button>
-      </div>
-    `;
-
-    // After render attaches
-    document.getElementById("like-yes").onclick = () => {
-      renderDetailedView(genIdx);
-      stepGeneration.style.display = 'none';
-      stepDetailed.style.display = '';
-    };
-    document.getElementById("like-no").onclick = () => {
-      // Show two pathway buttons
-      document.getElementById("choose-paths").style.display = "";
-    };
-
-    const btnPast = document.getElementById("to-past");
-    const btnFuture = document.getElementById("to-future");
-    if(btnPast) {
-      btnPast.onclick = function() {
-        if (genIdx === 0) {
-          // This should not happen
-          alert("No more past generations to explore.");
-        } else {
-          renderGenerationScreen(genIdx - 1);
-        }
-      };
-    }
-    if(btnFuture) {
-      btnFuture.onclick = function() {
-        if (genIdx === generations.length-1) {
-          alert("No more future generations to explore.");
-        } else {
-          renderGenerationScreen(genIdx + 1);
-        }
-      };
-    }
-
-    document.getElementById("restart").onclick = function() {
-      stepGeneration.style.display = 'none';
-      stepDetailed.style.display = 'none';
-      stepDob.style.display = '';
-      // Reset any state
-      document.getElementById('dob').value = '';
-    };
-  }
-
-  function renderDetailedView(genIdx) {
-    const gen = generations[genIdx];
-    
-    // Build demo tracks
-    let demoList = '';
-    gen.songDemos.forEach((demo, i) => {
-      const embedUrl = buildYouTubeEmbed(demo.url);
-      demoList += `
-        <div class="music-player">
-          <strong>🎶 ${demo.title}</strong><br>
-          ${
-            embedUrl
-              ? `<iframe style="width:100%;aspect-ratio:16/9;margin-top:8px;border:0;" src="${embedUrl}" title="${demo.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
-              : `<div class="meta" style="margin-top:8px;">Add YouTube URL for this track.</div>`
-          }
-        </div>
-      `;
-    });
-    
-    // Top songs
-    let topSongsHtml = "<ul>";
-    gen.topSongs.forEach(song => { topSongsHtml += "<li>"+song+"</li>";});
-    topSongsHtml += "</ul>";
-
-    // Fun facts
-    let funFactsHtml = "<ul style='list-style-type: none; padding-left: 0;'>";
-    gen.funFacts.forEach(fact => {
-      funFactsHtml += `<li style='margin: 10px 0; padding-left: 20px; position: relative;'><span style='position: absolute; left: 0;'>✨</span>${fact}</li>`;
-    });
-    funFactsHtml += "</ul>";
-
-    let detailedSection = `
-      <div class="generation-section">
-        <div class="meta"><span class="emoji">${gen.emoji}</span> <span style="font-size:1.12em;font-weight:bolder">${gen.name}</span></div>
-        <div style="font-style:italic;color:#b4bfec; margin-bottom: 20px;">${gen.genres} · ${gen.mood}</div>
-        
-        <div style="background: #1a1f34; border-radius: 8px; padding: 20px; margin: 20px 0;">
-          <h2 style="color: #ffd369; margin-top: 0;">📚 All About This Generation</h2>
-          <div class="artists"><b>Key Artists:</b> ${gen.artists}</div>
-          <div style="margin-top: 12px;"><b>Motto/Quote:</b> <span style="color:#ffd369">${gen.phrase}</span></div>
-          <div style="margin-top: 12px;"><b>Common Instruments:</b> ${gen.instruments}</div>
-          <div style="margin: 15px 0;"><b>About this generation:</b><br> ${gen.about}</div>
-        </div>
-
-        <div class="song-list" style="margin: 20px 0;"><b>Demo Instrumental Tracks:</b>${demoList}</div>
-        
-        <div class="top-songs" style="margin: 20px 0;"><b>Top Songs from this Era:</b> ${topSongsHtml}</div>
-
-        <div style="background: #1a1f34; border-radius: 8px; padding: 20px; margin: 20px 0;">
-          <h2 style="color: #ffd369; margin-top: 0;">🎉 Fun Facts</h2>
-          ${funFactsHtml}
-        </div>
-
-        <div class="meta" style="margin: 20px 0 10px 0;">
-           You are in the <b>${ordinalSuffix(genIdx+1)} out of ${generations.length} musical generations</b>.
-        </div>
-      </div>
-    `;
-    
-    stepDetailed.innerHTML = `
-      <h1>Your Musical Generation - Deep Dive</h1>
-      ${detailedSection}
-      <div style="margin:18px 0 0 0; text-align:center;">
-        <button id="back-to-generation" style="margin-right: 10px;">⬅ Back to Generation</button>
-        <button id="restart-detailed">🔄 Start Over</button>
-      </div>
-    `;
-
-    // Attach event handlers
-    document.getElementById("back-to-generation").onclick = function() {
-      stepDetailed.style.display = 'none';
-      stepGeneration.style.display = '';
-    };
-
-    document.getElementById("restart-detailed").onclick = function() {
-      stepDetailed.style.display = 'none';
-      stepGeneration.style.display = 'none';
-      stepDob.style.display = '';
-      document.getElementById('dob').value = '';
-    };
-  }
-
-  function ordinalSuffix(num) {
-    if (num % 10 == 1 && num % 100 != 11) return num + "st";
-    if (num % 10 == 2 && num % 100 != 12) return num + "nd";
-    if (num % 10 == 3 && num % 100 != 13) return num + "rd";
-    return num + "th";
-  }
-});
-</script>
-</body>
-</html>
-];
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Set max date for DOB input to today
-  document.getElementById('dob').max = new Date().toISOString().split('T')[0];
-
-  const stepDob = document.getElementById("step-dob");
-  const stepGeneration = document.getElementById("step-generation");
-  const stepDetailed = document.getElementById("step-detailed");
-
-  let userGenerationIndex = null;
-
-  document.getElementById("submit-dob").onclick = function() {
-    const dobValue = document.getElementById("dob").value;
-    if (!dobValue) {
-      alert("Please enter your date of birth!");
-      return;
-    }
-    const year = (new Date(dobValue)).getFullYear();
-    userGenerationIndex = getGenerationIndexByYear(year);
-
-    if (userGenerationIndex === -1) {
-      alert("Couldn't determine your generation from the date. Please try again.");
-      return;
-    }
-    // Go to generation info page
-    renderGenerationScreen(userGenerationIndex);
-    stepDob.style.display = 'none';
-    stepGeneration.style.display = '';
-  };
-
-  function getGenerationIndexByYear(year) {
-    for (let i=0; i<generations.length; ++i) {
-      let [start, end] = generations[i].years;
-      if (year >= start && year <= end)
-        return i;
-    }
-    return -1;
-  }
-
-  function getYouTubeId(url) {
-    if (!url) return null;
-    const match = url.match(
-      /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/
-    );
-    return match ? match[1] : null;
-  }
-
-  function buildYouTubeEmbed(url) {
-    const id = getYouTubeId(url);
-    if (!id) return null;
-    return `https://www.youtube.com/embed/${id}`;
-  }
-
-  function renderGenerationScreen(genIdx) {
-    const gen = generations[genIdx];
-    let demoList = '';
-    gen.songDemos.forEach((demo, i) => {
-      const embedUrl = buildYouTubeEmbed(demo.url);
-      // Use audio tag, preload demo
-      demoList += `
-        <div class="music-player">
-          <strong>🎶 ${demo.title}</strong><br>
-          ${
-            embedUrl
-              ? `<iframe style="width:100%;aspect-ratio:16/9;margin-top:8px;border:0;" src="${embedUrl}" title="${demo.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
-              : `<div class="meta" style="margin-top:8px;">Add YouTube URL for this track.</div>`
-          }
-        </div>
-      `;
-    });
-    // Top songs
-    let topSongsHtml = "<ul>";
-    gen.topSongs.forEach(song => { topSongsHtml += "<li>"+song+"</li>";});
-    topSongsHtml += "</ul>";
-
-    // Navigation
-    let navButtons = '';
-    // Like/Dislike only if not at edge
-    let noPast = (genIdx === 0);
-    let noFuture = (genIdx === generations.length-1);
-
-    // Main "Do you like this?" question
-    navButtons += `
-      <div class="likes-buttons">
-        <button id="like-yes">👍 I like it!</button>
-        <button id="like-no">👎 Not my vibe</button>
-      </div>
-    `;
-
-    let pathButtons = "";
-    if (!noPast) {
-      pathButtons += `<button id="to-past" style="margin-top:6px;">⬅ Explore Past Generation</button>`;
-    } else {
-      pathButtons += `<button disabled>No more past generations</button>`;
-    }
-
-    if (!noFuture) {
-      pathButtons += `<button id="to-future" style="margin-top:6px;">Explore Future Generation ➡</button>`;
-    } else {
-      pathButtons += `<button disabled>No more future generations</button>`;
-    }
-
-    let genSection = `
-      <div class="generation-section" >
-        <div class="meta"><span class="emoji">${gen.emoji}</span> <span style="font-size:1.12em;font-weight:bolder">${gen.name}</span></div>
-        <div style="font-style:italic;color:#b4bfec">${gen.genres} · ${gen.mood}</div>
-        <div class="artists"><b>Key Artists:</b> ${gen.artists}</div>
-        <div><b>Motto/Quote:</b> <span style="color:#ffd369">${gen.phrase}</span></div>
-        <div class="song-list"><b>Demo Instrumental Tracks:</b>${demoList}</div>
-        <div class="top-songs"><b>Top Songs from this Era:</b> ${topSongsHtml}</div>
-        <div><b>Common Instruments:</b> ${gen.instruments}</div>
-        <div style="margin:7px 0 15px 0;"><b>About this generation:</b><br> ${gen.about}</div>
-        <div class="meta" style="margin-bottom:10px;">
-           You are in the <b>${ordinalSuffix(genIdx+1)} out of ${generations.length} musical generations</b>.
-        </div>
-        ${navButtons}
-        <div id="choose-paths" style="display:none;margin-top:12px;">
-          <div style="font-size:1em;font-weight:bold;margin-bottom:8px;">Where would you like to go?</div>
-          ${pathButtons}
-        </div>
-      </div>
-    `;
-    stepGeneration.innerHTML = `
-      <h1>Your Musical Generation</h1>
-      ${genSection}
-      <div style="margin:18px 0 0 0; text-align:center;">
-        <button id="restart">🔄 Start Over</button>
-      </div>
-    `;
-
-    // After render attaches
-    document.getElementById("like-yes").onclick = () => {
-      renderDetailedView(genIdx);
-      stepGeneration.style.display = 'none';
-      stepDetailed.style.display = '';
-    };
-    document.getElementById("like-no").onclick = () => {
-      // Show two pathway buttons
-      document.getElementById("choose-paths").style.display = "";
-    };
-
-    const btnPast = document.getElementById("to-past");
-    const btnFuture = document.getElementById("to-future");
-    if(btnPast) {
-      btnPast.onclick = function() {
-        if (genIdx === 0) {
-          // This should not happen
-          alert("No more past generations to explore.");
-        } else {
-          renderGenerationScreen(genIdx - 1);
-        }
-      };
-    }
-    if(btnFuture) {
-      btnFuture.onclick = function() {
-        if (genIdx === generations.length-1) {
-          alert("No more future generations to explore.");
-        } else {
-          renderGenerationScreen(genIdx + 1);
-        }
-      };
-    }
-
-    document.getElementById("restart").onclick = function() {
-      stepGeneration.style.display = 'none';
-      stepDetailed.style.display = 'none';
-      stepDob.style.display = '';
-      // Reset any state
-      document.getElementById('dob').value = '';
-    };
-  }
-
-  function renderDetailedView(genIdx) {
-    const gen = generations[genIdx];
-    
-    // Build demo tracks
-    let demoList = '';
-    gen.songDemos.forEach((demo, i) => {
-      const embedUrl = buildYouTubeEmbed(demo.url);
-      demoList += `
-        <div class="music-player">
-          <strong>🎶 ${demo.title}</strong><br>
-          ${
-            embedUrl
-              ? `<iframe style="width:100%;aspect-ratio:16/9;margin-top:8px;border:0;" src="${embedUrl}" title="${demo.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
-              : `<div class="meta" style="margin-top:8px;">Add YouTube URL for this track.</div>`
-          }
-        </div>
-      `;
-    });
-    
-    // Top songs
-    let topSongsHtml = "<ul>";
-    gen.topSongs.forEach(song => { topSongsHtml += "<li>"+song+"</li>";});
-    topSongsHtml += "</ul>";
-
-    // Fun facts
-    let funFactsHtml = "<ul style='list-style-type: none; padding-left: 0;'>";
-    gen.funFacts.forEach(fact => {
-      funFactsHtml += `<li style='margin: 10px 0; padding-left: 20px; position: relative;'><span style='position: absolute; left: 0;'>✨</span>${fact}</li>`;
-    });
-    funFactsHtml += "</ul>";
-
-    let detailedSection = `
-      <div class="generation-section">
-        <div class="meta"><span class="emoji">${gen.emoji}</span> <span style="font-size:1.12em;font-weight:bolder">${gen.name}</span></div>
-        <div style="font-style:italic;color:#b4bfec; margin-bottom: 20px;">${gen.genres} · ${gen.mood}</div>
-        
-        <div style="background: #1a1f34; border-radius: 8px; padding: 20px; margin: 20px 0;">
-          <h2 style="color: #ffd369; margin-top: 0;">📚 All About This Generation</h2>
-          <div class="artists"><b>Key Artists:</b> ${gen.artists}</div>
-          <div style="margin-top: 12px;"><b>Motto/Quote:</b> <span style="color:#ffd369">${gen.phrase}</span></div>
-          <div style="margin-top: 12px;"><b>Common Instruments:</b> ${gen.instruments}</div>
-          <div style="margin: 15px 0;"><b>About this generation:</b><br> ${gen.about}</div>
-        </div>
-
-        <div class="song-list" style="margin: 20px 0;"><b>Demo Instrumental Tracks:</b>${demoList}</div>
-        
-        <div class="top-songs" style="margin: 20px 0;"><b>Top Songs from this Era:</b> ${topSongsHtml}</div>
-
-        <div style="background: #1a1f34; border-radius: 8px; padding: 20px; margin: 20px 0;">
-          <h2 style="color: #ffd369; margin-top: 0;">🎉 Fun Facts</h2>
-          ${funFactsHtml}
-        </div>
-
-        <div class="meta" style="margin: 20px 0 10px 0;">
-           You are in the <b>${ordinalSuffix(genIdx+1)} out of ${generations.length} musical generations</b>.
-        </div>
-      </div>
-    `;
-    
-    stepDetailed.innerHTML = `
-      <h1>Your Musical Generation - Deep Dive</h1>
-      ${detailedSection}
-      <div style="margin:18px 0 0 0; text-align:center;">
-        <button id="back-to-generation" style="margin-right: 10px;">⬅ Back to Generation</button>
-        <button id="restart-detailed">🔄 Start Over</button>
-      </div>
-    `;
-
-    // Attach event handlers
     document.getElementById("back-to-generation").onclick = function() {
       stepDetailed.style.display = 'none';
       stepGeneration.style.display = '';
