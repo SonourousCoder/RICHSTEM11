@@ -110,6 +110,28 @@
       font-size: 0.98em;
       color: #a0b3e8;
     }
+    .quiz-card {
+      margin-top: 14px;
+      line-height: 1.6;
+      background: #1a1f34;
+      border-radius: 12px;
+      padding: 20px 22px 16px 22px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    }
+    .quiz-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    select {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1em;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -119,12 +141,16 @@
       <label for="dob">Enter your date of birth:</label>
       <input type="date" id="dob" max="">
       <button id="submit-dob">Find My Vibe</button>
+      <button id="start-quiz">🎯 Take the Music Quiz</button>
     </div>
     <div id="step-generation" style="display:none;">
       <!-- Generation info gets rendered here -->
     </div>
     <div id="step-detailed" style="display:none;">
       <!-- Detailed generation view with fun facts gets rendered here -->
+    </div>
+    <div id="step-quiz" style="display:none;">
+      <!-- Quiz gets rendered here -->
     </div>
   </div>
 <script>
@@ -426,8 +452,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const stepDob = document.getElementById("step-dob");
   const stepGeneration = document.getElementById("step-generation");
   const stepDetailed = document.getElementById("step-detailed");
+  const stepQuiz = document.getElementById("step-quiz");
 
   let userGenerationIndex = null;
+  let quizState = null;
 
   document.getElementById("submit-dob").onclick = function() {
     const dobValue = document.getElementById("dob").value;
@@ -446,6 +474,14 @@ document.addEventListener('DOMContentLoaded', function() {
     renderGenerationScreen(userGenerationIndex);
     stepDob.style.display = 'none';
     stepGeneration.style.display = '';
+  };
+
+  document.getElementById("start-quiz").onclick = function() {
+    startQuiz();
+    stepDob.style.display = 'none';
+    stepGeneration.style.display = 'none';
+    stepDetailed.style.display = 'none';
+    stepQuiz.style.display = '';
   };
 
   function getGenerationIndexByYear(year) {
@@ -469,6 +505,109 @@ document.addEventListener('DOMContentLoaded', function() {
     const id = getYouTubeId(url);
     if (!id) return null;
     return `https://www.youtube.com/embed/${id}`;
+  }
+
+  function buildQuizPool() {
+    const pool = [];
+    generations.forEach((gen) => {
+      gen.songDemos.forEach((demo) => {
+        pool.push({
+          title: demo.title,
+          url: demo.url,
+          generationName: gen.name
+        });
+      });
+    });
+    return pool;
+  }
+
+  function shuffle(list) {
+    const arr = list.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startQuiz() {
+    const pool = shuffle(buildQuizPool());
+    const questions = pool.slice(0, 5);
+    quizState = {
+      index: 0,
+      score: 0,
+      questions
+    };
+    renderQuizQuestion();
+  }
+
+  function renderQuizQuestion() {
+    const total = quizState.questions.length;
+    const current = quizState.questions[quizState.index];
+    const embedUrl = buildYouTubeEmbed(current.url);
+    const generationOptions = generations.map(gen => `<option value="${gen.name}">${gen.name}</option>`).join("");
+
+    stepQuiz.innerHTML = `
+      <h1>Music Generation Quiz</h1>
+      <div class="quiz-card">
+        <div class="meta">Question ${quizState.index + 1} of ${total}</div>
+        <div style="margin-top:10px;"><b>Guess the generation for:</b> ${current.title}</div>
+        ${embedUrl ? `<iframe style="width:100%;aspect-ratio:16/9;margin-top:10px;border:0;" src="${embedUrl}" title="${current.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>` : ""}
+        <div style="margin-top:12px;">
+          <label for="quiz-answer">Pick the generation:</label>
+          <select id="quiz-answer">
+            <option value="" selected disabled>Select a generation</option>
+            ${generationOptions}
+          </select>
+        </div>
+        <div class="quiz-controls">
+          <button id="quiz-exit">⬅ Back</button>
+          <button id="quiz-next">${quizState.index === total - 1 ? "Finish Quiz" : "Next"}</button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("quiz-exit").onclick = function() {
+      stepQuiz.style.display = 'none';
+      stepDob.style.display = '';
+    };
+
+    document.getElementById("quiz-next").onclick = function() {
+      const answer = document.getElementById("quiz-answer").value;
+      if (!answer) return;
+      if (answer === current.generationName) {
+        quizState.score += 1;
+      }
+      quizState.index += 1;
+      if (quizState.index >= total) {
+        renderQuizResults();
+      } else {
+        renderQuizQuestion();
+      }
+    };
+  }
+
+  function renderQuizResults() {
+    stepQuiz.innerHTML = `
+      <h1>Quiz Results</h1>
+      <div class="quiz-card" style="text-align:center;">
+        <div style="font-size:1.2em;margin-bottom:10px;">Your Score</div>
+        <div style="font-size:2.2em;font-weight:bold;color:#ffd369;">${quizState.score} / ${quizState.questions.length}</div>
+        <div class="meta" style="margin-top:10px;">Nice try — want to play again?</div>
+        <div style="margin-top:14px;">
+          <button id="quiz-retry">🔁 New Quiz</button>
+          <button id="quiz-home">🏠 Back to Start</button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("quiz-retry").onclick = function() {
+      startQuiz();
+    };
+    document.getElementById("quiz-home").onclick = function() {
+      stepQuiz.style.display = 'none';
+      stepDob.style.display = '';
+    };
   }
 
   function renderGenerationScreen(genIdx) {
