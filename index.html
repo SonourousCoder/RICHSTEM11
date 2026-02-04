@@ -132,6 +132,26 @@
       font-size: 1em;
       width: 100%;
     }
+    .stem-card {
+      margin-top: 14px;
+      line-height: 1.6;
+      background: #1a1f34;
+      border-radius: 12px;
+      padding: 22px 24px 18px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    }
+    .stem-item {
+      margin: 12px 0;
+      padding: 12px;
+      background: #161a29;
+      border-radius: 8px;
+    }
+    .stem-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -142,6 +162,12 @@
       <input type="date" id="dob" max="">
       <button id="submit-dob">Find My Vibe</button>
       <button id="start-quiz">🎯 Take the Music Quiz</button>
+      <div class="stem-buttons">
+        <button id="open-science">🧪 Science + Music</button>
+        <button id="open-technology">💻 Technology + Music</button>
+        <button id="open-engineering">🛠️ Engineering + Music</button>
+        <button id="open-math">📐 Math + Music</button>
+      </div>
     </div>
     <div id="step-generation" style="display:none;">
       <!-- Generation info gets rendered here -->
@@ -151,6 +177,9 @@
     </div>
     <div id="step-quiz" style="display:none;">
       <!-- Quiz gets rendered here -->
+    </div>
+    <div id="step-stem" style="display:none;">
+      <!-- STEM content gets rendered here -->
     </div>
   </div>
 <script>
@@ -453,6 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const stepGeneration = document.getElementById("step-generation");
   const stepDetailed = document.getElementById("step-detailed");
   const stepQuiz = document.getElementById("step-quiz");
+  const stepStem = document.getElementById("step-stem");
 
   let userGenerationIndex = null;
   let quizState = null;
@@ -482,6 +512,20 @@ document.addEventListener('DOMContentLoaded', function() {
     stepGeneration.style.display = 'none';
     stepDetailed.style.display = 'none';
     stepQuiz.style.display = '';
+    stepStem.style.display = 'none';
+  };
+
+  document.getElementById("open-science").onclick = function() {
+    renderStem("Science");
+  };
+  document.getElementById("open-technology").onclick = function() {
+    renderStem("Technology");
+  };
+  document.getElementById("open-engineering").onclick = function() {
+    renderStem("Engineering");
+  };
+  document.getElementById("open-math").onclick = function() {
+    renderStem("Math");
   };
 
   function getGenerationIndexByYear(year) {
@@ -505,6 +549,60 @@ document.addEventListener('DOMContentLoaded', function() {
     const id = getYouTubeId(url);
     if (!id) return null;
     return `https://www.youtube.com/embed/${id}`;
+  }
+
+  const stemContent = {
+    Science: [
+      { title: "Physics of Sound", detail: "Overtones and harmonics shape timbre — from orchestral strings to electric guitars." },
+      { title: "Acoustics & Spaces", detail: "Hall geometry amplified classical music; stadium acoustics shaped rock and pop shows." },
+      { title: "Psychoacoustics", detail: "How we perceive loudness and pitch influenced modern mixing choices." }
+    ],
+    Technology: [
+      { title: "Recording Evolution", detail: "From mono to multitrack studios, each era gained more control over sound." },
+      { title: "Digital Tools", detail: "DAWs, sampling, and Auto-Tune redefined 2000s–2010s production." },
+      { title: "Streaming & Discovery", detail: "Algorithms and short-form platforms define 2010s–2020s listening habits." }
+    ],
+    Engineering: [
+      { title: "Instrument Design", detail: "Electric pickups, synth circuits, and drum kits enabled new genres." },
+      { title: "Audio Hardware", detail: "Amplifiers, mixers, and microphones shaped rock, hip-hop, and pop." },
+      { title: "Live Sound Systems", detail: "PA engineering brought stadium tours and festival culture to life." }
+    ],
+    Math: [
+      { title: "Rhythm & Time", detail: "Swing, syncopation, and 4/4 patterns are structured by math." },
+      { title: "Frequency & Pitch", detail: "Ratios and scales define harmony across generations." },
+      { title: "Tempo & BPM", detail: "Beat math drives EDM drops, hip-hop flow, and dance energy." }
+    ]
+  };
+
+  function renderStem(topic) {
+    const items = stemContent[topic] || [];
+    const list = items.map(item => `
+      <div class="stem-item">
+        <b>${item.title}</b>
+        <div class="meta" style="margin-top:6px;">${item.detail}</div>
+      </div>
+    `).join("");
+
+    stepStem.innerHTML = `
+      <h1>${topic} in Music Generations</h1>
+      <div class="stem-card">
+        ${list}
+        <div style="margin-top:12px; text-align:center;">
+          <button id="stem-back">⬅ Back to Start</button>
+        </div>
+      </div>
+    `;
+
+    stepDob.style.display = 'none';
+    stepGeneration.style.display = 'none';
+    stepDetailed.style.display = 'none';
+    stepQuiz.style.display = 'none';
+    stepStem.style.display = '';
+
+    document.getElementById("stem-back").onclick = function() {
+      stepStem.style.display = 'none';
+      stepDob.style.display = '';
+    };
   }
 
   function buildQuizPool() {
