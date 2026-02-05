@@ -16,16 +16,20 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: stretch;
     }
     .container {
-      margin-top: 40px;
+      margin: 0;
       background: #242946;
-      border-radius: 16px;
-      padding: 36px 30px 24px 30px;
+      border-radius: 0;
+      border: 3px solid #3a4168;
+      padding: 32px 36px 28px 36px;
       box-shadow: 0 12px 48px rgba(0,0,0,0.25);
-      max-width: 540px;
+      max-width: 1200px;
       width: 100%;
+      min-height: 100vh;
+      box-sizing: border-box;
+      animation: fadeSlide 0.5s ease;
     }
     h1 {
       margin-top: 0;
@@ -65,11 +69,13 @@
     }
     .generation-section {
       margin-top: 14px;
-      line-height: 1.6;
+      line-height: 1.75;
       background: #1a1f34;
-      border-radius: 12px;
+      border-radius: 14px;
+      border: 2px solid #2d3354;
       padding: 26px 28px 18px 28px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+      animation: fadeUp 0.35s ease;
     }
     .song-list, .top-songs, .artists {
       margin-bottom: 12px;
@@ -82,9 +88,11 @@
     .music-player {
       margin: 10px 0 20px 0;
       background: #161a29;
-      border-radius: 6px;
+      border-radius: 10px;
+      border: 2px solid #2d3354;
       padding: 10px;
       text-align: center;
+      animation: fadeUp 0.35s ease;
     }
     .music-player iframe {
       display: block;
@@ -112,11 +120,13 @@
     }
     .quiz-card {
       margin-top: 14px;
-      line-height: 1.6;
+      line-height: 1.75;
       background: #1a1f34;
-      border-radius: 12px;
+      border-radius: 14px;
+      border: 2px solid #2d3354;
       padding: 20px 22px 16px 22px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+      animation: fadeUp 0.35s ease;
     }
     .quiz-controls {
       display: flex;
@@ -134,17 +144,21 @@
     }
     .stem-card {
       margin-top: 14px;
-      line-height: 1.6;
+      line-height: 1.75;
       background: #1a1f34;
-      border-radius: 12px;
+      border-radius: 14px;
+      border: 2px solid #2d3354;
       padding: 22px 24px 18px 24px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+      animation: fadeUp 0.35s ease;
     }
     .stem-item {
       margin: 12px 0;
       padding: 12px;
       background: #161a29;
-      border-radius: 8px;
+      border-radius: 10px;
+      border: 2px solid #2d3354;
+      animation: fadeUp 0.35s ease;
     }
     .stem-buttons {
       display: grid;
@@ -152,12 +166,35 @@
       gap: 10px;
       margin-top: 10px;
     }
+    .wide-text {
+      line-height: 1.8;
+      font-size: 1.02em;
+    }
+    .timeline-item {
+      margin: 12px 0;
+      padding: 14px;
+      background: #161a29;
+      border-radius: 10px;
+      border: 2px solid #2d3354;
+      animation: fadeUp 0.35s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .page-section.animate {
+      animation: fadeUp 0.35s ease;
+    }
   </style>
 </head>
 <body>
   <div class="container" id="app">
     <h1>What's Your Musical Generation?</h1>
-    <div id="step-dob">
+    <div id="step-dob" class="page-section">
       <label for="dob">Enter your date of birth:</label>
       <input type="date" id="dob" max="">
       <button id="submit-dob">Find My Vibe</button>
@@ -167,19 +204,27 @@
         <button id="open-technology">💻 Technology + Music</button>
         <button id="open-engineering">🛠️ Engineering + Music</button>
         <button id="open-math">📐 Math + Music</button>
+        <button id="open-timeline">🧭 Music Timeline</button>
+        <button id="open-evolution">🌊 Evolution of Music</button>
       </div>
     </div>
-    <div id="step-generation" style="display:none;">
+    <div id="step-generation" class="page-section" style="display:none;">
       <!-- Generation info gets rendered here -->
     </div>
-    <div id="step-detailed" style="display:none;">
+    <div id="step-detailed" class="page-section" style="display:none;">
       <!-- Detailed generation view with fun facts gets rendered here -->
     </div>
-    <div id="step-quiz" style="display:none;">
+    <div id="step-quiz" class="page-section" style="display:none;">
       <!-- Quiz gets rendered here -->
     </div>
-    <div id="step-stem" style="display:none;">
+    <div id="step-stem" class="page-section" style="display:none;">
       <!-- STEM content gets rendered here -->
+    </div>
+    <div id="step-timeline" class="page-section" style="display:none;">
+      <!-- Timeline content gets rendered here -->
+    </div>
+    <div id="step-evolution" class="page-section" style="display:none;">
+      <!-- Evolution content gets rendered here -->
     </div>
   </div>
 <script>
@@ -483,9 +528,23 @@ document.addEventListener('DOMContentLoaded', function() {
   const stepDetailed = document.getElementById("step-detailed");
   const stepQuiz = document.getElementById("step-quiz");
   const stepStem = document.getElementById("step-stem");
+  const stepTimeline = document.getElementById("step-timeline");
+  const stepEvolution = document.getElementById("step-evolution");
 
   let userGenerationIndex = null;
   let quizState = null;
+
+  function showSection(active) {
+    const sections = [stepDob, stepGeneration, stepDetailed, stepQuiz, stepStem, stepTimeline, stepEvolution];
+    sections.forEach(section => {
+      section.style.display = section === active ? "" : "none";
+      if (section === active) {
+        section.classList.remove("animate");
+        void section.offsetWidth;
+        section.classList.add("animate");
+      }
+    });
+  }
 
   document.getElementById("submit-dob").onclick = function() {
     const dobValue = document.getElementById("dob").value;
@@ -502,17 +561,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // Go to generation info page
     renderGenerationScreen(userGenerationIndex);
-    stepDob.style.display = 'none';
-    stepGeneration.style.display = '';
+    showSection(stepGeneration);
   };
 
   document.getElementById("start-quiz").onclick = function() {
     startQuiz();
-    stepDob.style.display = 'none';
-    stepGeneration.style.display = 'none';
-    stepDetailed.style.display = 'none';
-    stepQuiz.style.display = '';
-    stepStem.style.display = 'none';
+    showSection(stepQuiz);
   };
 
   document.getElementById("open-science").onclick = function() {
@@ -526,6 +580,12 @@ document.addEventListener('DOMContentLoaded', function() {
   };
   document.getElementById("open-math").onclick = function() {
     renderStem("Math");
+  };
+  document.getElementById("open-timeline").onclick = function() {
+    renderTimeline();
+  };
+  document.getElementById("open-evolution").onclick = function() {
+    renderEvolution();
   };
 
   function getGenerationIndexByYear(year) {
@@ -562,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
       { title: "Engineering and music across generations", detail: "Engineering turns musical ideas into scalable sound. Early eras relied on craft engineering: instrument builders refined string tension, key mechanisms, and resonant wood to project in acoustic halls. As jazz and swing grew, engineers built microphones, mixers, and PA systems that could handle louder ensembles. The 1950s and 1960s required electrical engineering for pickups, amplifiers, and effects, giving rock its signature bite. In the 1970s, studio engineering exploded with multitrack consoles, signal routing, and outboard gear, while live sound engineers designed systems for arenas and festivals. The 1980s and 1990s added digital engineering: MIDI, digital synthesis, and compact storage formats made complex production possible. The 2000s moved engineering into software, with plugins that emulate hardware and automate mixing, while still depending on hardware interfaces and monitoring. Today, engineering spans acoustics, hardware, and software at once, from stage rigs to mobile-friendly mixes. Each generation’s sound is a direct result of how engineers solved problems of power, fidelity, portability, and scale." }
     ],
     Math: [
-      { title: "Math and music across generations", detail: "Math is the invisible framework of music. Early classical music used ratios for tuning and harmony, so intervals and scales were literally numeric relationships. In the early 1900s, swing and jazz emphasized syncopation, which is rhythmic math: delaying or subdividing beats to create tension. The 1950s and 1960s codified popular song structures in simple time signatures like 4/4 and 12-bar patterns, making rock easy to follow and dance to. The 1970s pushed groove math with funk and disco, where precise subdivision and repetition created hypnotic movement. In the 1980s and 1990s, quantization and MIDI relied on grid-based timing and BPM, and hip-hop sampling introduced loop math, where bars and beats align across sources. The 2000s and 2010s leaned on tempo mapping and rhythmic precision to drive EDM drops and pop hooks. Today, math also underpins digital audio: sampling rates, bit depth, and Fourier analysis control clarity and tone. Across generations, melody, rhythm, and production are built on numerical structure." }
+      { title: "Math and music across generations", detail: "Math is the invisible framework of music. Early classical music used ratios for tuning and harmony, so intervals and scales were literally numeric relationships. In the early 1900s, swing and jazz emphasized syncopation, which is rhythmic math: delaying or subdividing beats to create tension. The 1950s and 1960s codified popular song structures in simple time signatures like 4/4 and 12-bar patterns, making rock easy to follow and dance to. The 1970s pushed groove math with funk and disco, where precise subdivision and repetition created hypnotic movement. The 1980s and 1990s, quantization and MIDI relied on grid-based timing and BPM, and hip-hop sampling introduced loop math, where bars and beats align across sources. The 2000s and 2010s leaned on tempo mapping and rhythmic precision to drive EDM drops and pop hooks. Today, math also underpins digital audio: sampling rates, bit depth, and Fourier analysis control clarity and tone. Across generations, melody, rhythm, and production are built on numerical structure." }
     ]
   };
 
@@ -585,15 +645,57 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     `;
 
-    stepDob.style.display = 'none';
-    stepGeneration.style.display = 'none';
-    stepDetailed.style.display = 'none';
-    stepQuiz.style.display = 'none';
-    stepStem.style.display = '';
+    showSection(stepStem);
 
     document.getElementById("stem-back").onclick = function() {
-      stepStem.style.display = 'none';
-      stepDob.style.display = '';
+      showSection(stepDob);
+    };
+  }
+
+  function renderTimeline() {
+    const items = generations.map(gen => `
+      <div class="timeline-item">
+        <div class="meta"><span class="emoji">${gen.emoji}</span> <b>${gen.name}</b></div>
+        <div class="wide-text">${gen.years[0]} – ${gen.years[1]}</div>
+        <div class="wide-text"><b>Genres:</b> ${gen.genres}</div>
+        <div class="wide-text"><b>Key Artists:</b> ${gen.artists}</div>
+      </div>
+    `).join("");
+
+    stepTimeline.innerHTML = `
+      <h1>Timeline of Music Generations</h1>
+      <div class="stem-card">
+        ${items}
+        <div style="margin-top:12px; text-align:center;">
+          <button id="timeline-back">⬅ Back to Start</button>
+        </div>
+      </div>
+    `;
+
+    showSection(stepTimeline);
+
+    document.getElementById("timeline-back").onclick = function() {
+      showSection(stepDob);
+    };
+  }
+
+  function renderEvolution() {
+    stepEvolution.innerHTML = `
+      <h1>Evolution of Music</h1>
+      <div class="stem-card wide-text">
+        <p>Music evolved through a constant feedback loop between culture, technology, and creative experimentation. Early generations relied on acoustic instruments and communal performance, so composition emphasized resonance, melody, and live dynamics. As recording and radio arrived in the early 1900s, music became portable and repeatable, which encouraged concise arrangements and distinctive voices. Mid-century rock and R&B merged amplified instruments with youth culture, and studios became creative laboratories where sound could be shaped as much as performed.</p>
+        <p>The 1970s and 1980s expanded the palette with synthesizers, drum machines, and multi-track production, giving rise to disco, new wave, and polished pop. The 1990s and 2000s normalized sampling, digital editing, and global genre blending—hip-hop, alternative, and electronic sounds now cross-pollinated constantly. In the 2010s and 2020s, streaming, algorithms, and short-form platforms changed how music is discovered and structured, favoring immediate hooks and viral moments.</p>
+        <p>Across every era, the core remains the same: rhythm, melody, and emotion. What changes is the toolkit, the distribution channel, and the social context. The result is a timeline where each generation both reacts to and borrows from the previous one, creating a living history of sound that keeps evolving.</p>
+        <div style="margin-top:12px; text-align:center;">
+          <button id="evolution-back">⬅ Back to Start</button>
+        </div>
+      </div>
+    `;
+
+    showSection(stepEvolution);
+
+    document.getElementById("evolution-back").onclick = function() {
+      showSection(stepDob);
     };
   }
 
@@ -774,8 +876,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById("like-yes").onclick = () => {
       renderDetailedView(genIdx);
-      stepGeneration.style.display = 'none';
-      stepDetailed.style.display = '';
+      showSection(stepDetailed);
     };
     document.getElementById("like-no").onclick = () => {
       document.getElementById("choose-paths").style.display = "";
@@ -803,9 +904,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById("restart").onclick = function() {
-      stepGeneration.style.display = 'none';
-      stepDetailed.style.display = 'none';
-      stepDob.style.display = '';
+      showSection(stepDob);
       document.getElementById('dob').value = '';
     };
   }
@@ -876,14 +975,11 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
 
     document.getElementById("back-to-generation").onclick = function() {
-      stepDetailed.style.display = 'none';
-      stepGeneration.style.display = '';
+      showSection(stepGeneration);
     };
 
     document.getElementById("restart-detailed").onclick = function() {
-      stepDetailed.style.display = 'none';
-      stepGeneration.style.display = 'none';
-      stepDob.style.display = '';
+      showSection(stepDob);
       document.getElementById('dob').value = '';
     };
   }
